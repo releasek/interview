@@ -1,33 +1,184 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "首頁";
+    Layout = "~/Views/Shared/_Layout2.cshtml";
 }
 
-<main>
-    <section class="row" aria-labelledby="aspnetTitle">
-        <h1 id="title">ASP.NET</h1>
-        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-        <p><a href="https://asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
-    </section>
+<style>
+    .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
 
-    <div class="row">
-        <section class="col-md-4" aria-labelledby="gettingStartedTitle">
-            <h2 id="gettingStartedTitle">Getting started</h2>
-            <p>
-                ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-                enables a clean separation of concerns and gives you full control over markup
-                for enjoyable, agile development.
-            </p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="librariesTitle">
-            <h2 id="librariesTitle">Get more libraries</h2>
-            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="hostingTitle">
-            <h2 id="hostingTitle">Web Hosting</h2>
-            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    .carousel-inner {
+        height: 400px;
+    }
+
+    .banner {
+        margin: 0 auto;
+        margin-top: 100px;
+        margin-bottom: 15px;
+    }
+
+    .container {
+        max-width: 1140px;
+        margin: 0 auto;
+    }
+
+    .card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        width: 180px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+    .card-img-top {
+        width: 100%;
+        height: 230px;
+        object-fit: cover;
+    }
+
+    .card-title {
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 1.4;
+        height: 2.8em;
+        overflow: hidden;
+    }
+
+    .card-text {
+        font-size: 14px;
+        color: #007BFF;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        background-color: white;
+        border-top: 1px solid #ddd;
+    }
+
+        .card-footer .btn {
+            width: 48%;
+            font-size: 14px;
+        }
+</style>
+
+<body>
+    <div class="banner">
+        <!-- 輪播 -->
+        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="~/image/banner/banner1.jpg" class="d-block w-100">
+                </div>
+                <div class="carousel-item">
+                    <img src="~/image/banner/banner5.jpg" class="d-block w-100">
+                </div>
+                <div class="carousel-item">
+                    <img src="~/image/banner/banner6.jpg" class="d-block w-100">
+                </div>
+                <div class="carousel-item">
+                    <img src="~/image/banner/banner7.jpg" class="d-block w-100">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 商品區塊 -->
+    <div id="app" class="container">
+        <section class="mb-2 mt-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>最新上架</h2>
+                <a href="~/Home/New" class="btn btn-outline-secondary btn-sm">More</a>
+            </div>
+            <div class="row">
+                <div v-for="item in products" :key="item.id" class="col-6 col-md-3 col-lg-2">
+                    <div class="card h-100">
+                        <a :href="'/Products/ProductDetail/' + item.id">
+                            <img :src="item.imageURL" class="card-img-top" :alt="item.title">
+                        </a>
+
+                        <div class="card-body">
+                            <h6 class="card-title">{{ item.title }}</h6>
+                            <p class="card-text">NT$ {{ item.price }}</p>
+                        </div>
+
+                        <div class="card-footer">
+                            <button class="btn btn-primary btn-sm" v-on:click="addToCart(item.id)">購買</button>
+                            <button class="btn btn-success btn-sm" v-on:click="addToFavorite(item.id)">收藏</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
     </div>
-</main>
+
+    <!-- Vue 3 -->
+    <script src="~/Js/vue.global.js"></script>
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const products = ref([]);
+
+                // 從 API 取得最新商品
+                const fetchProducts = async () => {
+                    try {
+                        const response = await fetch("/api/products/latest");
+                        products.value = await response.json();
+                    } catch (error) {
+                        console.error("獲取商品失敗：", error);
+                    }
+                };
+
+                // 加入購物車
+                const addToCart = (id) => {
+                    fetch("/Cart/AddToCart", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ ProductId: id }),
+                    }).then(() => alert("商品已加入購物車！"));
+                };
+
+                // 加入收藏
+                const addToFavorite = (id) => {
+                    fetch("/Cart/AddToFavorite", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ ProductId: id }),
+                    }).then(() => alert("商品已加入收藏！"));
+                };
+
+                onMounted(fetchProducts);
+
+                return { products, addToCart, addToFavorite };
+            },
+        }).mount("#app");
+    </script>
+</body>
