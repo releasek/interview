@@ -10,15 +10,19 @@ namespace interview.Models.Services
     {
         private readonly ProductRepo _productRepo;
 
-        public ProductService(ProductRepo productRepo)
+        public ProductService()
         {
-            _productRepo = productRepo;
+            _productRepo = new ProductRepo();
         }
 
         public async Task<List<Products>> GetBooks()
         {
 
             return await _productRepo.GetBooks();
+        }
+        public async Task<Products> GetBookById(int id)
+        {
+            return await _productRepo.GetBookById(id);
         }
         public async Task<int> CreateBook(Products product)
         {

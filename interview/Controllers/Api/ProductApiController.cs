@@ -1,21 +1,21 @@
 ﻿using interview.Models.EFModels;
 using interview.Models.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Collections.Generic;
+
 
 namespace interview.Controllers.Api
 {
+    [RoutePrefix("api/products")]
     public class ProductApiController : ApiController
     {
         private readonly ProductService _productService;
-        public ProductApiController(ProductService productService)
+
+        public ProductApiController()
         {
-            _productService = productService;
+            _productService = new ProductService();
         }
 
         [HttpGet]
@@ -41,7 +41,7 @@ namespace interview.Controllers.Api
             try
             {
                 var newBookId = await _productService.CreateBook(product);
-                return Ok(newBookId);
+                return Ok(new { Message = "新增成功", CreateId = product.Id });
             }
             catch (ArgumentNullException)
             {
@@ -49,5 +49,37 @@ namespace interview.Controllers.Api
                 return BadRequest("書籍資料不可為空");
             }
         }
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<IHttpActionResult> UpdateBook(int id, [FromBody] Products product)
+        {
+            if (product == null) return BadRequest("請輸入商品");
+            try
+            {
+                var newBook = await _productService.UpdateBook(product);
+                return Ok(new { Message = "修改成功", UpdateId = id });
+            }
+            catch (ArgumentNullException)
+            {
+                //400 Bad Request
+                return BadRequest("書籍資料不可為空");
+            }
+        }
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IHttpActionResult> DeleteBook(int id)
+        {
+            try
+            {
+                await _productService.DeleteBook(id);
+                return Ok(new { Message="刪除成功",DeleteId=id});
+            }
+            catch (KeyNotFoundException)
+            {
+                //404 Not Found
+                return NotFound();
+            }
+        }
+
     }
 }

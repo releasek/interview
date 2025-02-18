@@ -11,9 +11,9 @@ namespace interview.Models.Repositories
     public class ProductRepo
     {
         private readonly AppDbContext _db;
-        public ProductRepo(AppDbContext context)
+        public ProductRepo()
         {
-            _db = context;
+            _db = new AppDbContext();
         }
         public async Task<List<Products>> GetBooks()
         {
