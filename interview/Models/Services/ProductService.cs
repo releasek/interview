@@ -28,12 +28,6 @@ namespace interview.Models.Services
         {
 
             if(product==null) throw new System.ArgumentNullException(nameof(product));
-
-            var CreateBook = await _productRepo.GetBookById(product.Id);
-            if (CreateBook != null)
-            {
-                throw new System.ArgumentException("書籍已存在");
-            }
             var newProduct = await _productRepo.Create(product);
             return newProduct.Id;
         }

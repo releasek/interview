@@ -159,6 +159,7 @@
     <Compile Include="Models\EFModels\Users.cs" />
     <Compile Include="Models\EFModels\Wishlist.cs" />
     <Compile Include="Models\Repositories\ProductRepo.cs" />
+    <Compile Include="Models\Repositories\PromotionRepo.cs" />
     <Compile Include="Models\Services\ProductService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -337,7 +338,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Shared\_Layout2.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>

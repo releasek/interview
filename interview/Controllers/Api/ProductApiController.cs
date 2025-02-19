@@ -38,17 +38,22 @@ namespace interview.Controllers.Api
         public async Task<IHttpActionResult> CreateBook([FromBody] Products product)
         {
             if (product == null) return BadRequest("請輸入商品");
+
             try
             {
                 var newBookId = await _productService.CreateBook(product);
-                return Ok(new { Message = "新增成功", CreateId = product.Id });
+                return Ok(new { Message = "新增成功", CreateId = newBookId });
             }
             catch (ArgumentNullException)
             {
-                //400 Bad Request
                 return BadRequest("書籍資料不可為空");
             }
+            catch (Exception ex)  // 捕捉所有異常
+            {
+                return InternalServerError(new Exception($"伺服器錯誤: {ex.Message}"));
+            }
         }
+
         [HttpPut]
         [Route("{id}")]
         public async Task<IHttpActionResult> UpdateBook(int id, [FromBody] Products product)

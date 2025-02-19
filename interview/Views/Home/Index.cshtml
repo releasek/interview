@@ -1,184 +1,205 @@
-﻿@{
-    ViewBag.Title = "首頁";
-    Layout = "~/Views/Shared/_Layout2.cshtml";
-}
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品管理</title>
 
-<style>
-    .carousel-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-    }
+    <!-- 引入 Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
-    .carousel-inner {
-        height: 400px;
-    }
+    <!-- 引入 Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    .banner {
-        margin: 0 auto;
-        margin-top: 100px;
-        margin-bottom: 15px;
-    }
-
-    .container {
-        max-width: 1140px;
-        margin: 0 auto;
-    }
-
-    .card {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 100%;
-        width: 180px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease-in-out;
-    }
-
-        .card:hover {
-            transform: translateY(-5px);
+    <style>
+        /* 美化 Modal 外觀 */
+        .modal-content {
+            border-radius: 10px;
         }
 
-    .card-img-top {
-        width: 100%;
-        height: 230px;
-        object-fit: cover;
-    }
-
-    .card-title {
-        font-size: 14px;
-        font-weight: bold;
-        line-height: 1.4;
-        height: 2.8em;
-        overflow: hidden;
-    }
-
-    .card-text {
-        font-size: 14px;
-        color: #007BFF;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-
-    .card-footer {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px;
-        background-color: white;
-        border-top: 1px solid #ddd;
-    }
-
-        .card-footer .btn {
-            width: 48%;
-            font-size: 14px;
+        /* 限制圖片大小 */
+        .product-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
         }
-</style>
 
+        /* 禁止 textarea 調整大小 */
+        textarea {
+            resize: none;
+        }
+    </style>
+</head>
 <body>
-    <div class="banner">
-        <!-- 輪播 -->
-        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-indicators">
-                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></button>
-                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></button>
-                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></button>
-                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3"></button>
-            </div>
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img src="~/image/banner/banner1.jpg" class="d-block w-100">
-                </div>
-                <div class="carousel-item">
-                    <img src="~/image/banner/banner5.jpg" class="d-block w-100">
-                </div>
-                <div class="carousel-item">
-                    <img src="~/image/banner/banner6.jpg" class="d-block w-100">
-                </div>
-                <div class="carousel-item">
-                    <img src="~/image/banner/banner7.jpg" class="d-block w-100">
-                </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon"></span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-                <span class="carousel-control-next-icon"></span>
-            </button>
-        </div>
-    </div>
+    <div id="app" class="container mt-5">
+        <h2 class="mb-4">📦 商品管理</h2>
 
-    <!-- 商品區塊 -->
-    <!--<div id="app" class="container">
-        <section class="mb-2 mt-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2>最新上架</h2>
-                <a href="~/Home/New" class="btn btn-outline-secondary btn-sm">More</a>
-            </div>
-            <div class="row">
-                <div v-for="item in products" :key="item.id" class="col-6 col-md-3 col-lg-2">
-                    <div class="card h-100">
-                        <a :href="'/Products/ProductDetail/' + item.id">
-                            <img :src="item.imageURL" class="card-img-top" :alt="item.title">
-                        </a>
+        <!-- 新增商品按鈕 -->
+        <button class="btn btn-primary mb-3" v-on:click="openModal()">+ 新增商品</button>
 
-                        <div class="card-body">
-                            <h6 class="card-title">{{ item.title }}</h6>
-                            <p class="card-text">NT$ {{ item.price }}</p>
-                        </div>
+        <!-- 商品列表 -->
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>名稱</th>
+                    <th>作者</th>
+                    <th>出版社</th>
+                    <th>價格</th>
+                    <th>描述</th>
+                    <th>分類 ID</th>
+                    <th>促銷 ID</th>
+                    <th>發行日期</th>
+                    <th>圖片</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 使用 v-for 渲染商品列表 -->
+                <tr v-for="(product, index) in products" :key="product.id">
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.title }}</td>
+                    <td>{{ product.author }}</td>
+                    <td>{{ product.publisher }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.description }}</td>
+                    <td>{{ product.categoryId }}</td>
+                    <td>{{ product.promotionId }}</td>
+                    <td>{{ product.publishDate }}</td>
+                    <td><img :src="product.imageURL" alt="商品圖片" class="product-image"></td>
+                    <td>
+                        <!-- 編輯按鈕：點擊時開啟 Modal，並傳入 index -->
+                        <button class="btn btn-warning btn-sm me-2" v-on:click="openModal(index)">編輯</button>
+                        <!-- 刪除按鈕：點擊時執行 deleteProduct(product.id) -->
+                        <button class="btn btn-danger btn-sm" v-on:click="deleteProduct(product.id)">刪除</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-                        <div class="card-footer">
-                            <button class="btn btn-primary btn-sm" v-on:click="addToCart(item.id)">購買</button>
-                            <button class="btn btn-success btn-sm" v-on:click="addToFavorite(item.id)">收藏</button>
-                        </div>
+        <!-- 新增/編輯商品 Modal -->
+        <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <!-- 根據 isEditing 來顯示不同標題 -->
+                        <h5 class="modal-title">{{ isEditing ? "編輯商品" : "新增商品" }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form v-on:submit.prevent="handleSubmit">
+                            <div class="mb-3">
+                                <label class="form-label">商品名稱</label>
+                                <input type="text" class="form-control" v-model="formData.title" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">作者</label>
+                                <input type="text" class="form-control" v-model="formData.author">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">出版社</label>
+                                <input type="text" class="form-control" v-model="formData.publisher">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">價格</label>
+                                <input type="number" class="form-control" v-model="formData.price" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">描述</label>
+                                <textarea class="form-control" rows="3" v-model="formData.description"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">{{ isEditing ? "更新商品" : "儲存" }}</button>
+                        </form>
                     </div>
                 </div>
             </div>
-        </section>
-    </div>-->
+        </div>
+    </div>
 
-    <!-- Vue 3 -->
-    @*<script src="~/Js/vue.global.js"></script>
     <script>
         const { createApp, ref, onMounted } = Vue;
 
         createApp({
             setup() {
                 const products = ref([]);
+                const apiUrl = "/api/products";
 
-                // 從 API 取得最新商品
-                const fetchProducts = async () => {
+                // 商品表單的資料
+                const formData = ref({
+                    id: null, title: "", author: "", publisher: "", price: null,
+                    description: "", categoryId: null, promotionId: null, publishDate: "", imageURL: ""
+                });
+
+                const isEditing = ref(false);  // 是否為編輯模式
+                let editIndex = null;  // 紀錄編輯的索引
+                let modalInstance = null;  // Bootstrap Modal 實例
+
+                // 載入商品列表
+                const loadProducts = async () => {
                     try {
-                        const response = await fetch("/api/products/latest");
+                        const response = await fetch(apiUrl);
                         products.value = await response.json();
                     } catch (error) {
-                        console.error("獲取商品失敗：", error);
+                        console.error("載入商品失敗:", error);
                     }
                 };
 
-                // 加入購物車
-                const addToCart = (id) => {
-                    fetch("/Cart/AddToCart", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ ProductId: id }),
-                    }).then(() => alert("商品已加入購物車！"));
+                // 開啟 Modal，決定是「新增」還是「編輯」
+                const openModal = (index = null) => {
+                    if (!modalInstance) {
+                        modalInstance = new bootstrap.Modal(document.getElementById('productModal'));
+                    }
+                    if (index !== null) {
+                        editIndex = index;
+                        isEditing.value = true;
+                        formData.value = { ...products.value[index] };  // 複製選中的商品
+                    } else {
+                        resetForm();
+                        isEditing.value = false;
+                    }
+                    modalInstance.show();
                 };
 
-                // 加入收藏
-                const addToFavorite = (id) => {
-                    fetch("/Cart/AddToFavorite", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ ProductId: id }),
-                    }).then(() => alert("商品已加入收藏！"));
+                // 送出表單（新增或編輯）
+                const handleSubmit = async () => {
+                    try {
+                        const method = isEditing.value ? "PUT" : "POST";
+                        const url = isEditing.value ? `${apiUrl}/${formData.value.id}` : apiUrl;
+
+                        await fetch(url, {
+                            method,
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(formData.value),
+                        });
+
+                        modalInstance.hide();
+                        loadProducts();
+                    } catch (error) {
+                        console.error("操作失敗:", error);
+                    }
                 };
 
-                onMounted(fetchProducts);
+                // 刪除商品
+                const deleteProduct = async (id) => {
+                    try {
+                        await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
+                        loadProducts();
+                    } catch (error) {
+                        console.error("刪除失敗:", error);
+                    }
+                };
 
-                return { products, addToCart, addToFavorite };
-            },
+                // 重置表單
+                const resetForm = () => {
+                    formData.value = { id: null, title: "", author: "", publisher: "", price: null, description: "", categoryId: null, promotionId: null, publishDate: "", imageURL: "" };
+                };
+
+                onMounted(loadProducts);
+
+                return { products, formData, isEditing, handleSubmit, deleteProduct, openModal };
+            }
         }).mount("#app");
-    </script>*@
+    </script>
 </body>
+</html>
