@@ -66,7 +66,8 @@
                     <td>{{ product.description }}</td>
                     <td>{{ product.categoryId }}</td>
                     <td>{{ product.promotionId }}</td>
-                    <td>{{ product.publishDate }}</td>
+
+                    <td>{{ new Date(product.publishDate).toISOString().split('T')[0] }}</td>
                     <td><img :src="product.imageURL" alt="商品圖片" class="product-image"></td>
                     <td>
                         <!-- 編輯按鈕：點擊時開啟 Modal，並傳入 index -->
@@ -109,9 +110,26 @@
                                 <label class="form-label">描述</label>
                                 <textarea class="form-control" rows="3" v-model="formData.description"></textarea>
                             </div>
+                            <div class="mb-3">
+                                <label class="form-label">分類 ID</label>
+                                <input type="number" class="form-control" v-model="formData.categoryId">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">促銷 ID</label>
+                                <input type="number" class="form-control" v-model="formData.promotionId">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">發行日期</label>
+                                <input type="date" class="form-control" v-model="formData.publishDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">圖片 URL</label>
+                                <input type="text" class="form-control" v-model="formData.imageURL">
+                            </div>
                             <button type="submit" class="btn btn-success w-100">{{ isEditing ? "更新商品" : "儲存" }}</button>
                         </form>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -150,16 +168,28 @@
                     if (!modalInstance) {
                         modalInstance = new bootstrap.Modal(document.getElementById('productModal'));
                     }
+
                     if (index !== null) {
                         editIndex = index;
                         isEditing.value = true;
-                        formData.value = { ...products.value[index] };  // 複製選中的商品
+
+                        // 取得選中的商品
+                        const selectedProduct = products.value[index];
+
+                        // ✅ 轉換日期格式 (如果日期存在，轉換為 YYYY-MM-DD)
+                        formData.value = {
+                            ...selectedProduct,
+                            validFrom: selectedProduct.validFrom ? new Date(selectedProduct.PublishDate).toISOString().split('T')[0] : "",
+                     
+                        };
                     } else {
                         resetForm();
                         isEditing.value = false;
                     }
+
                     modalInstance.show();
                 };
+
 
                 // 送出表單（新增或編輯）
                 const handleSubmit = async () => {

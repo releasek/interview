@@ -48,10 +48,6 @@ namespace interview.Controllers.Api
             {
                 return BadRequest("書籍資料不可為空");
             }
-            catch (Exception ex)  // 捕捉所有異常
-            {
-                return InternalServerError(new Exception($"伺服器錯誤: {ex.Message}"));
-            }
         }
 
         [HttpPut]
