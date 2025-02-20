@@ -143,6 +143,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\Api\ProductApiController.cs" />
     <Compile Include="Controllers\Api\PromotionApiController.cs" />
+    <Compile Include="Controllers\Api\OrderApiController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PromotionController.cs" />
     <Compile Include="Global.asax.cs">
@@ -160,11 +161,14 @@
     <Compile Include="Models\EFModels\sysdiagrams.cs" />
     <Compile Include="Models\EFModels\Users.cs" />
     <Compile Include="Models\EFModels\Wishlist.cs" />
+    <Compile Include="Models\Infra\Paged.cs" />
+    <Compile Include="Models\Infra\Pagination.cs" />
     <Compile Include="Models\Repositories\OrderRepo.cs" />
     <Compile Include="Models\Repositories\ProductRepo.cs" />
     <Compile Include="Models\Repositories\PromotionRepo.cs" />
     <Compile Include="Models\Services\ProductService.cs" />
     <Compile Include="Models\Services\PromotionService.cs" />
+    <Compile Include="Models\Services\OrderService.cs" />
     <Compile Include="Models\ViewModels\OrderQueryParameters.cs" />
     <Compile Include="Models\ViewModels\OrderVm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,7 +6,8 @@ using System.Web;
 namespace interview.Models.ViewModels
 {
     public class OrderVm
-    {       public int OrderId { get; set; } // 訂單 ID
+    {      
+        public int OrderId { get; set; } // 訂單 ID
         public string OrderName { get; set; } // 訂單名稱
         public decimal TotalAmount { get; set; } // 訂單總金額
         public DateTime? OrderDate { get; set; } // 訂單日期

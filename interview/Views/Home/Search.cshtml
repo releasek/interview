@@ -3,5 +3,303 @@
     ViewBag.Title = "Search";
 }
 
-<h2>Search</h2>
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    /* 自定義樣式 */
+    .search-container {
+        margin-bottom: 20px;
+    }
+
+        .search-container input,
+        .search-container select,
+        .search-container button {
+            margin-right: 10px;
+        }
+
+    .table-container {
+        margin-top: 20px;
+    }
+
+    .pagination-container {
+        margin-top: 20px;
+        text-align: center;
+    }
+</style>
+
+<body>
+    <div class="container mt-4" id="app">
+        <h1>訂單管理</h1>
+
+        <!-- 搜尋條件區域 -->
+        <div class="search-container row">
+            <div class="col-md-2">
+                <label for="start-date" class="form-label">開始時間</label>
+                <input type="date" id="start-date" class="form-control" v-model="filters.startDate">
+            </div>
+            <div class="col-md-2">
+                <label for="end-date" class="form-label">結束時間</label>
+                <input type="date" id="end-date" class="form-control" v-model="filters.endDate">
+            </div>
+            <div class="col-md-2">
+                <label for="min-amount" class="form-label">金額</label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number"
+                           id="min-amount"
+                           class="form-control"
+                           v-model="filters.minAmount"
+                           placeholder="輸金額"
+                           min="0">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label for="payment-method" class="form-label">排序</label>
+                <select id="payment-method" class="form-select" v-model="filters.paymentMethod">
+                    <option value="">不限</option>
+                    <option value="asc">金額低排序</option>
+                    <option value="desc">金額高排序</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="global-search" class="form-label">搜尋</label>
+                <input type="text"
+                       id="global-search"
+                       class="form-control"
+                       placeholder="訂單編號or收件人姓名"
+                       v-model="filters.searchQuery">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary w-100" v-on:click="fetchOrders">查詢</button>
+            </div>
+        </div>
+
+        <!-- 表格展示 -->
+        <div class="table-container mt-4">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>訂單名稱</th>
+                        <th>用戶名稱</th>
+                        <th>商品總數量</th>
+                        <th>總金額</th>
+                        <th>訂單日期</th>
+                    </tr>
+                </thead>
+                <tbody v-if="filteredOrders.length > 0">
+                    <tr v-for="(order, index) in filteredOrders" :key="index">
+                        <td>{{ order.orderName }}</td>
+                        <td>{{ order.userName }}</td>
+                        <td>{{ order.totalQuantity }}</td>
+                        <td>{{ order.totalAmount }}</td>
+                        <td>{{ new Date(order.orderDate).toISOString().split('T')[0] }}</td>
+                    </tr>
+                </tbody>
+                <tbody v-else>
+                    <tr>
+                        <td colspan="5" class="text-center">沒有符合條件的訂單</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分頁區域 -->
+        <div class="pagination-container" v-if="pagination.totalPages > 1">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- 第一頁 -->
+                    <li class="page-item" :class="{ disabled: pagination.pageNumber === 1 }">
+                        <button class="page-link" v-on:click="changePage(1)" :disabled="pagination.pageNumber === 1">第一頁</button>
+                    </li>
+                    <!-- 上一頁 -->
+                    <li class="page-item" :class="{ disabled: pagination.pageNumber === 1 }">
+                        <button class="page-link" v-on:click="changePage(pagination.pageNumber - 1)" :disabled="pagination.pageNumber === 1">上一頁</button>
+                    </li>
+                    <!-- 分頁按鈕 -->
+                    <li class="page-item"
+                        v-for="page in totalPagesArray"
+                        :key="page"
+                        :class="{ active: page === pagination.pageNumber }">
+                        <button class="page-link" v-on:click="changePage(page)">{{ page }}</button>
+                    </li>
+                    <!-- 下一頁 -->
+                    <li class="page-item" :class="{ disabled: pagination.pageNumber === pagination.totalPages }">
+                        <button class="page-link" v-on:click="changePage(pagination.pageNumber + 1)" :disabled="pagination.pageNumber === pagination.totalPages">下一頁</button>
+                    </li>
+                    <!-- 最後一頁 -->
+                    <li class="page-item" :class="{ disabled: pagination.pageNumber === pagination.totalPages }">
+                        <button class="page-link" v-on:click="changePage(pagination.totalPages)" :disabled="pagination.pageNumber === pagination.totalPages">最後一頁</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
+    <!-- 引入 Bootstrap 的 JavaScript -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp, ref, computed, onMounted } = Vue;
+
+        const appConfig = {
+            setup() {
+                // 訂單資料
+                const orders = ref([]); // API 回傳的訂單資料
+
+                // 篩選條件
+                const filters = ref({
+                    searchQuery: "",
+                    startDate: "",
+                    endDate: "",
+                    minAmount: "",
+                    paymentMethod: "",
+                });
+
+                const activeFilters = ref({
+                    searchQuery: "",
+                    startDate: "",
+                    endDate: "",
+                    minAmount: "",
+                    paymentMethod: "",
+                });
+
+                // 分頁資訊
+                const pagination = ref({
+                    pageNumber: 1, // 當前頁碼
+                    pageSize: 5,   // 每頁顯示的記錄數
+                    totalRecords: 0, // 總記錄數
+                    totalPages: 0,   // 總頁數
+                });
+
+                // 加載狀態與錯誤訊息
+                const isLoading = ref(false);
+                const errorMessage = ref("");
+
+                // 計算總頁數的陣列，用於渲染分頁按鈕
+                const totalPagesArray = computed(() =>
+                    Array.from({ length: pagination.value.totalPages }, (_, i) => i + 1)
+                );
+
+                // 根據 activeFilters 過濾訂單資料
+                const filteredOrders = computed(() => {
+                    let filtered = orders.value;
+
+                    if (activeFilters.value.searchQuery) {
+                        filtered = filtered.filter(order =>
+                            order.orderName.includes(activeFilters.value.searchQuery) ||
+                            order.userName.includes(activeFilters.value.searchQuery)
+                        );
+                    }
+
+                    if (activeFilters.value.startDate) {
+                        filtered = filtered.filter(order =>
+                            new Date(order.orderDate) >= new Date(activeFilters.value.startDate)
+                        );
+                    }
+
+                    if (activeFilters.value.endDate) {
+                        filtered = filtered.filter(order =>
+                            new Date(order.orderDate) <= new Date(activeFilters.value.endDate)
+                        );
+                    }
+                    return filtered;
+                });
+
+                // 改變頁碼的方法
+                const changePage = async (page) => {
+                    if (page >= 1 && page <= pagination.value.totalPages) {
+                        pagination.value.pageNumber = page;
+                        await fetchOrders(); // 當頁碼改變時重新獲取數據
+                    }
+                };
+
+                // 獲取訂單資料
+                const fetchOrders = async () => {
+                    try {
+                        console.log("按下查詢按鈕，開始執行搜尋");
+                        isLoading.value = true;
+                        errorMessage.value = "";
+
+                        // 更新 activeFilters 為當前的篩選條件
+                        activeFilters.value = { ...filters.value };
+
+                        // 構造查詢參數
+                        const queryParams = {
+                            keyword: activeFilters.value.searchQuery,
+                            startDate: activeFilters.value.startDate,
+                            endDate: activeFilters.value.endDate,
+                            Amount: activeFilters.value.minAmount,
+                            AmountSort: activeFilters.value.paymentMethod,
+                            pageNumber: pagination.value.pageNumber, // 傳遞當前頁碼
+                            pageSize: pagination.value.pageSize,     // 傳遞每頁大小
+                        };
+                        console.log("查詢參數:", queryParams);
+
+                        // 組合查詢 URL
+                        const queryString = new URLSearchParams(queryParams).toString();
+                        const url = `/api/OrderApi/GetOrder?${queryString}`;
+                        console.log("組合的 URL:", url);
+
+                        // 調用 API
+                        const response = await fetch(url, { method: "GET" });
+
+                        // 檢查回應是否成功
+                        if (!response.ok) {
+                            throw new Error("Failed to fetch order search results.");
+                        }
+
+                        // 獲取 JSON 資料
+                        const result = await response.json();
+                        console.log("API 回傳結果:", result);
+
+                        // 更新分頁資訊
+                        if (result.pagination) {
+                            pagination.value.totalRecords = result.pagination.totalRecords;
+                            pagination.value.totalPages = result.pagination.totalPages;
+                        } else {
+                            pagination.value.totalRecords = 0;
+                            pagination.value.totalPages = 0;
+                        }
+
+                        // 提取訂單資料
+                        console.log('result.data', result.data);
+                        console.log('result', result);
+                        console.log('Array.isArray(result.data)', Array.isArray(result.data));
+                        if (result && Array.isArray(result.data)) {
+                            orders.value = result.data;
+                        } else {
+                            orders.value = [];
+                        }
+                    } catch (error) {
+                        errorMessage.value = "無法獲取訂單資料，請稍後再試。";
+                        console.error("API 請求錯誤:", error);
+                    } finally {
+                        isLoading.value = false;
+                    }
+                };
+
+                // 初始化訂單資料
+                onMounted(fetchOrders);
+
+                return {
+                    orders,
+                    filters,
+                    activeFilters,
+                    filteredOrders,
+                    fetchOrders,
+                    isLoading,
+                    errorMessage,
+                    pagination,
+                    totalPagesArray,
+                    changePage,
+                };
+            },
+        };
+
+        createApp(appConfig).mount("#app");
+    </script>
+
+
+</body>
+</html>
 
