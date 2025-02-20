@@ -160,10 +160,13 @@
     <Compile Include="Models\EFModels\sysdiagrams.cs" />
     <Compile Include="Models\EFModels\Users.cs" />
     <Compile Include="Models\EFModels\Wishlist.cs" />
+    <Compile Include="Models\Repositories\OrderRepo.cs" />
     <Compile Include="Models\Repositories\ProductRepo.cs" />
     <Compile Include="Models\Repositories\PromotionRepo.cs" />
     <Compile Include="Models\Services\ProductService.cs" />
     <Compile Include="Models\Services\PromotionService.cs" />
+    <Compile Include="Models\ViewModels\OrderQueryParameters.cs" />
+    <Compile Include="Models\ViewModels\OrderVm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -343,6 +346,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Promotion\Index.cshtml" />
+    <Content Include="Views\Home\Search.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
