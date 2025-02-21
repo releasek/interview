@@ -42,7 +42,6 @@ namespace interview.Controllers.Api
                         {
                             pageNumber = data.Pagination.PageNumber,
                             pageSize = data.Pagination.PageSize,
-                            totalRecords = data.Pagination.TotalRecords,
                             totalPages = data.Pagination.TotalPages
                         }
                     });
