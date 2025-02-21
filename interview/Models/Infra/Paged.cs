@@ -14,11 +14,11 @@ namespace interview.Models.Infra
             Selected = selected;
             Options = options;
         }
-        public IEnumerable<T> Data { get; }
-        public Pagination Pagination { get; }
 
-        public string Selected { get; }
+        public IEnumerable<T> Data { get; } // 分頁後的資料
+        public Pagination Pagination { get; } // 分頁資訊
 
-        public IEnumerable<string> Options { get; }
+        public string Selected { get; } // 當前選中的篩選條件
+        public IEnumerable<string> Options { get; } // 可選的篩選條件
     }
 }

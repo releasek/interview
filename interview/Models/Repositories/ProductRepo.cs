@@ -23,11 +23,7 @@ namespace interview.Models.Repositories
         {
             return await _db.Products.FirstOrDefaultAsync(x => x.Id == id);
         }
-        /// <summary>
-        /// 新增商品   
-        /// </summary>
-        /// <param name="product"></param>
-        /// <returns></returns>
+
         public async Task<Products> Create(Products product)
         {
             if (product == null)
@@ -38,12 +34,7 @@ namespace interview.Models.Repositories
             await _db.SaveChangesAsync();
             return product;
         }
-        /// <summary>
-        /// 編輯書籍
-        /// </summary>
-        /// <param name="product"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
+
         public async Task<Products> Update(Products product)
         {
             if (product == null)
@@ -56,12 +47,7 @@ namespace interview.Models.Repositories
             return product;
         }
 
-        /// <summary>
-        /// 刪除商品
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
+
         public async Task Delete(int id)
         {
            

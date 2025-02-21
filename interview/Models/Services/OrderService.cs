@@ -41,16 +41,6 @@ namespace interview.Models.Services
             return new Paged<OrderVm>(data, pagination, parameters.Keyword, null);
         }
 
-        public async Task<List<OrderVm>> GetOrder(OrderQueryParameters parameters)
-        {
-
-                // 從 Repository 獲取查詢結果
-                var query = await _orderRepo.GetOrder(parameters);
-
-                // 將查詢轉換為 List 並返回
-                return query.ToList();
-
-        }
 
         public async Task<Paged<OrderVm>> GetPageOrder(OrderQueryParameters parameters)
         {
